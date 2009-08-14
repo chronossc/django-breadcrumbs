@@ -1,0 +1,300 @@
+diff -urN django-original/contrib/breadcrumbs/breadcrumbs.py django/contrib/breadcrumbs/breadcrumbs.py
+--- django-original/contrib/breadcrumbs/breadcrumbs.py	1969-12-31 21:00:00.000000000 -0300
++++ django/contrib/breadcrumbs/breadcrumbs.py	2009-08-13 16:48:45.000000000 -0300
+@@ -0,0 +1,167 @@
++"""
++Classes to add request.breadcrumbs as one class to have a list of breadcrumbs
++TODO: maybe is better to move to contrib/breadcrumbs
++"""
++
++from django.conf import settings
++from django.utils.translation import ugettext_lazy as _
++from django.utils.safestring import mark_safe
++from django.utils.text import force_unicode 
++import sys
++
++class Singleton(object):
++    """
++    We use a simple singleton pattern in Breadcrumbs.
++    Example from http://svn.ademar.org/code/trunk/junk-code/singleton_vs_borg.py
++    """
++    def __new__(cls, *args, **kwds):
++        it = cls.__dict__.get("__it__")
++        if it is not None:
++            return it
++        cls.__it__ = it = object.__new__(cls)
++        it._1st_init(*args, **kwds)
++        return it
++
++    def _1st_init(self, *args, **kwds):
++        pass
++
++class BreadcrumbsInvalidFormat(Exception):
++    """
++    Simple exception that can be extended
++    """
++    pass
++
++class BreadcrumbsNotSet(Exception):
++    """
++    Raised in utils.breadcrumbs_for_flatpages when we not have breadcrumbs in
++    request.
++    """
++    pass
++
++class Breadcrumb(object):
++    """
++    Breadcrumb can have methods to customize breadcrumb object, Breadcrumbs
++    class send to us name and url.
++    """
++    def __init__(self,name,url):
++        # HERE
++        #
++        # If I don't use force_unicode, always runs ok, but have problems on
++        # template with unicode text
++        self.name = name
++        self.url = url
++
++    def __str__(self):
++        return self.__unicode__()
++
++    def __unicode__(self):
++        return u"%s,%s" % (self.name,self.url)
++
++    def __repr__(self):
++        return u"Breadcrumb <%s,%s>" % (self.name,self.url)
++
++class Breadcrumbs(Singleton):
++    """
++    Breadcrumbs maintain a list of breadcrumbs that you can get interating with
++    class or with get_breadcrumbs().
++    """
++    def _1st_init(self,*args,**kwargs):
++        """
++        singleton function that start some variables
++        """
++        self._clean()
++        self.__init__(*args,**kwargs)
++
++    def __call__(self,*args,**kwargs):
++        if not len(args) and not len(kwargs):
++            return self
++        return self.__init__(*args,**kwargs)
++
++    def _clean(self):
++        self.__bds = []
++        self.__autohome=settings.BREADCRUMBS_AUTO_HOME
++        self.__urls =[]
++
++    def __init__(self,*args,**kwargs):
++        """
++        Call validate and if ok, call fill bd
++        """
++        if settings.BREADCRUMBS:
++
++            # fill home if settings.BREADCRUMBS_AUTO_HOME is True
++            if self.__autohome and len(self.__bds) == 0:
++                self.__fill_bds( ( _("Home"), u"/" ) )
++
++            # match Breadcrumbs( 'name', 'url' )
++            if len(args) == 2 and type(args[0]) not in (list,tuple):
++                if(self.__validate(args,0)):
++                    self.__fill_bds( args )
++            # match ( ( 'name', 'url'), ..) and samething with list
++            elif len(args) == 1 and type(args[0]) in (list,tuple) \
++                    and len(args[0]) > 0:
++                for i,arg in enumerate(args[0]):
++                    if self.__validate(arg,i):
++                        self.__fill_bds( arg )
++            # try to ( obj1, obj2, ... ) and samething with list
++            else:
++                for i,arg in enumerate(args):
++                    if(self.__validate(arg,i)):
++                        self.__fill_bds( arg )
++
++    def __validate(self,obj,index):
++        """
++        check for object type and return a string as name for each item of a
++        list or tuple with items, if error was found raise
++        BreadcrumbsInvalidFormat
++        """
++        # for list or tuple
++        if type(obj) in (list,tuple):
++            if len(obj) == 2:
++                if (not obj[0] and not obj[1]) or \
++                ( type(obj[0]) not in (str,unicode) and \
++                  type(obj[1]) not in (str,unicode)):
++                    raise BreadcrumbsInvalidFormat(u"Invalid format for \
++                        breadcrumb %s in %s" % (index,type(obj).__name__))
++            if len(obj) != 2:
++                raise BreadcrumbsInvalidFormat(
++                    u"Wrong itens number in breadcrumb %s in %s. \
++                    You need to send as example (name,url)" % \
++                    (index,type(obj).__name__)
++                )
++        # for objects
++        elif not hasattr(obj,'name') and not hasattr(obj,'url'):
++            raise BreadcrumbsInvalidFormat(u"You need to use a tuple like"+ \
++                " (name,url) or object with name and url attributes for" + \
++                "breadcrumb.")
++        return True
++
++    def __fill_bds(self,bd):
++        """
++        simple interface to add Breadcrumb to bds
++        """
++        if hasattr(bd,'name') and hasattr(bd,'url'):
++            bd = Breadcrumb(bd.name,bd.url)
++        else:
++            bd = Breadcrumb(*bd)
++        if bd.url not in self.__urls:
++            self.__bds.append(bd)
++            self.__urls.append(bd.url)
++
++    def __iter__(self):
++        return iter(self.__bds)
++
++    def __getitem__(self,key):
++        return self.__bds[key]
++
++    def __repr__(self):
++        return self.__unicode__()
++
++    def __str__(self):
++        return self.__unicode__()
++
++    def __unicode__(self):
++        return u"Breadcrumbs <%s>" % u", ".join([mark_safe(item.name) for item in \
++            self[:10]] + [u' ...'])
++
++    def all(self):
++        return self.__bds
+diff -urN django-original/contrib/breadcrumbs/HowToUse.txt django/contrib/breadcrumbs/HowToUse.txt
+--- django-original/contrib/breadcrumbs/HowToUse.txt	1969-12-31 21:00:00.000000000 -0300
++++ django/contrib/breadcrumbs/HowToUse.txt	2009-08-13 16:48:45.000000000 -0300
+@@ -0,0 +1,31 @@
++To use breadcrumbs, after unpack this package you need to follow some steps:
++
++1 - Set in your settings.py:
++
++	#Options to enable Breadcrumbs package:
++	BREADCRUMBS = False # Enable breadcrumbs
++	BREADCRUMBS_AUTO_HOME = False # If True, all times first link is (_("Home"),u"/")
++
++	# Add BreadcrumbsMiddleware in your MIDDLEWARE_CLASSES, Ex:
++
++	MIDDLEWARE_CLASSES = (
++	...
++	'django.contrib.breadcrumbs.middleware.BreadcrumbsMiddleware',
++	)
++
++2 - For each view that you want to show on Breadcrumbs, you can use some of
++examples bellow:
++
++	# For two itens (or more) on path
++	request.breadcrumbs(
++		(_("Profile"),reverse(UserShowProfile)),
++		(_("Favorites"),reverse(UserFavs))
++	)
++
++	# For one item on path
++	request.breadcrumbs( _("Profile"),reverse(UserShowProfile) )
++
++	# Without reverse:
++	request.breadcrumbs( u"Name", "URL" )
++
++Breadcrumbs have a path to support flatpages without problems :)
+diff -urN django-original/contrib/breadcrumbs/__init__.py django/contrib/breadcrumbs/__init__.py
+--- django-original/contrib/breadcrumbs/__init__.py	1969-12-31 21:00:00.000000000 -0300
++++ django/contrib/breadcrumbs/__init__.py	2009-08-13 16:48:45.000000000 -0300
+@@ -0,0 +1 @@
++from breadcrumbs import Breadcrumb
+diff -urN django-original/contrib/breadcrumbs/middleware.py django/contrib/breadcrumbs/middleware.py
+--- django-original/contrib/breadcrumbs/middleware.py	1969-12-31 21:00:00.000000000 -0300
++++ django/contrib/breadcrumbs/middleware.py	2009-08-13 16:48:45.000000000 -0300
+@@ -0,0 +1,7 @@
++from breadcrumbs import Breadcrumbs
++
++class BreadcrumbsMiddleware(object):
++
++    def process_request(self,request):
++        request.breadcrumbs = Breadcrumbs()
++        request.breadcrumbs._clean()
+diff -urN django-original/contrib/breadcrumbs/tests.py django/contrib/breadcrumbs/tests.py
+--- django-original/contrib/breadcrumbs/tests.py	1969-12-31 21:00:00.000000000 -0300
++++ django/contrib/breadcrumbs/tests.py	2009-08-13 16:48:45.000000000 -0300
+@@ -0,0 +1,21 @@
++# run this script on your shell
++from django.contrib.breadcrumbs import Breadcrumbs
++
++bds = Breadcrumbs()
++
++# fill one per time
++for i in range(5):
++    bds( 'name%s' % i,'url%s' % i  )
++
++# create a simple class to emulate one object with name and url
++class emulatedobj(object):
++    def __init__(self,*args):
++        self.name = args[0]
++        self.url = args[1]
++
++# add 10 objects
++bds( [ emulatedobj('name %s' % (i+10), 'url %s' % (i+10)) for i in range(10) ] )
++
++# print all
++for bd in bds:
++    print bd.name,bd.url
+diff -urN django-original/contrib/breadcrumbs/utils.py django/contrib/breadcrumbs/utils.py
+--- django-original/contrib/breadcrumbs/utils.py	1969-12-31 21:00:00.000000000 -0300
++++ django/contrib/breadcrumbs/utils.py	2009-08-13 16:48:45.000000000 -0300
+@@ -0,0 +1,49 @@
++from breadcrumbs import Breadcrumbs,BreadcrumbsNotSet
++from django.contrib.flatpages.models import FlatPage
++from django.http import Http404
++
++def breadcrumbs_for_flatpages(request,flatpage):
++
++    if not hasattr(request,'breadcrumbs') or \
++        not isinstance(request.breadcrumbs,Breadcrumbs):
++        raise BreadcrumbNotSet(u"You need to setup breadcrumbs to use this " + \
++                "function.")
++
++    if not isinstance(flatpage,FlatPage) or \
++        not hasattr(flatpage,'id'):
++        raise TypeError(u"flatpage argument isn't a FlatPage instance or " + \
++            "not have id.")
++
++    paths = []
++    for part in request.path_info.split(u"/"):
++        # When split we have u"" for slashes
++        if len(part) == 0:
++            continue
++        # Add slash again
++        if not part.startswith(u"/"):
++            part = u"/"+part
++        if not part.endswith(u"/"):
++            part = part+u"/"
++        # If we have something on paths, url for flatpage is composed of what we
++        # have in path + part. Note that strins in path not have last slash, but
++        # part have.
++        if len(paths) > 0:
++            url = u"".join(paths+[part])
++        else:
++            url = part
++        # if is same url we don't hit database again
++        # else, get page from FlatPage. If page doesn't exist, we allow raise
++        # 404 because it is a url design problem, not flatpages or breadcrumbs
++        # problem.
++        if url == flatpage.url:
++            request.breadcrumbs(flatpage.title,flatpage.url)
++        else:
++            try:
++                f = FlatPage.objects.get(url=url)
++            except FlatPage.DoesNotExist:
++                raise Http404
++            else:
++                request.breadcrumbs(f.title,f.url)
++        # add last part of path in paths with one slash
++        paths.append(u"/"+url[1:-1].rpartition(u"/")[-1])
++

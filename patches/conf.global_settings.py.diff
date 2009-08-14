@@ -1,0 +1,15 @@
+diff -urN django-original/conf/global_settings.py django/conf/global_settings.py
+--- django-original/conf/global_settings.py	2009-08-13 16:42:33.000000000 -0300
++++ django/conf/global_settings.py	2009-08-13 16:48:45.000000000 -0300
+@@ -398,3 +398,11 @@
+ 
+ # The list of directories to search for fixtures
+ FIXTURE_DIRS = ()
++
++###############
++# BREADCRUMBS #
++###############
++
++# Enable/Disable breadcrumbs, default: disabled
++BREADCRUMBS = False
++BREADCRUMBS_AUTO_HOME = False

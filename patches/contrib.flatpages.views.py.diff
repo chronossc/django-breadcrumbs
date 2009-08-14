@@ -1,0 +1,21 @@
+diff -urN django-original/contrib/flatpages/views.py django/contrib/flatpages/views.py
+--- django-original/contrib/flatpages/views.py	2009-08-13 16:42:33.000000000 -0300
++++ django/contrib/flatpages/views.py	2009-08-13 16:48:45.000000000 -0300
+@@ -5,6 +5,7 @@
+ from django.conf import settings
+ from django.core.xheaders import populate_xheaders
+ from django.utils.safestring import mark_safe
++from django.contrib.breadcrumbs.utils import breadcrumbs_for_flatpages
+ 
+ DEFAULT_TEMPLATE = 'flatpages/default.html'
+ 
+@@ -29,6 +30,9 @@
+     if f.registration_required and not request.user.is_authenticated():
+         from django.contrib.auth.views import redirect_to_login
+         return redirect_to_login(request.path)
++    # if user enabled contrib.breadcrumbs add page to breadcrumbs
++    if settings.BREADCRUMBS:
++        breadcrumbs_for_flatpages(request,f)
+     if f.template_name:
+         t = loader.select_template((f.template_name, DEFAULT_TEMPLATE))
+     else:
