@@ -4,7 +4,7 @@ TODO: maybe is better to move to contrib/breadcrumbs
 """
 
 from django.conf import settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 from django.utils.text import force_unicode 
 import sys
@@ -79,34 +79,32 @@ class Breadcrumbs(Singleton):
 
     def _clean(self):
         self.__bds = []
-        self.__autohome=settings.BREADCRUMBS_AUTO_HOME
+        self.__autohome=getattr(settings,'BREADCRUMBS_AUTO_HOME',False)
         self.__urls =[]
 
     def __init__(self,*args,**kwargs):
         """
         Call validate and if ok, call fill bd
         """
-        if settings.BREADCRUMBS:
+        # fill home if settings.BREADCRUMBS_AUTO_HOME is True
+        if self.__autohome and len(self.__bds) == 0:
+            self.__fill_bds( ( _("Home"), u"/" ) )
 
-            # fill home if settings.BREADCRUMBS_AUTO_HOME is True
-            if self.__autohome and len(self.__bds) == 0:
-                self.__fill_bds( ( _("Home"), u"/" ) )
-
-            # match Breadcrumbs( 'name', 'url' )
-            if len(args) == 2 and type(args[0]) not in (list,tuple):
-                if(self.__validate(args,0)):
-                    self.__fill_bds( args )
-            # match ( ( 'name', 'url'), ..) and samething with list
-            elif len(args) == 1 and type(args[0]) in (list,tuple) \
-                    and len(args[0]) > 0:
-                for i,arg in enumerate(args[0]):
-                    if self.__validate(arg,i):
-                        self.__fill_bds( arg )
-            # try to ( obj1, obj2, ... ) and samething with list
-            else:
-                for i,arg in enumerate(args):
-                    if(self.__validate(arg,i)):
-                        self.__fill_bds( arg )
+        # match Breadcrumbs( 'name', 'url' )
+        if len(args) == 2 and type(args[0]) not in (list,tuple):
+            if(self.__validate(args,0)):
+                self.__fill_bds( args )
+        # match ( ( 'name', 'url'), ..) and samething with list
+        elif len(args) == 1 and type(args[0]) in (list,tuple) \
+                and len(args[0]) > 0:
+            for i,arg in enumerate(args[0]):
+                if self.__validate(arg,i):
+                    self.__fill_bds( arg )
+        # try to ( obj1, obj2, ... ) and samething with list
+        else:
+            for i,arg in enumerate(args):
+                if(self.__validate(arg,i)):
+                    self.__fill_bds( arg )
 
     def __validate(self,obj,index):
         """
@@ -165,3 +163,5 @@ class Breadcrumbs(Singleton):
 
     def all(self):
         return self.__bds
+
+# vim: ts=4 sts=4 sw=4 et ai 

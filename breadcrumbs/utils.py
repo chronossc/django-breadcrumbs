@@ -1,4 +1,5 @@
-from breadcrumbs import Breadcrumbs,BreadcrumbsNotSet
+# -*- coding: utf-8 -*-
+from .breadcrumbs import Breadcrumbs,BreadcrumbsNotSet
 from django.contrib.flatpages.models import FlatPage
 from django.http import Http404
 

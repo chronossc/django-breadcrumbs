@@ -1,5 +1,7 @@
+# -*- 
+
 # run this script on your shell
-from django.contrib.breadcrumbs import Breadcrumbs
+from breadcrumbs import Breadcrumbs
 
 bds = Breadcrumbs()
 
