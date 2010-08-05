@@ -4,7 +4,8 @@ from django.contrib.flatpages.models import FlatPage
 from django.http import Http404
 
 def breadcrumbs_for_flatpages(request,flatpage):
-
+    """ given request and flatpage instance create breadcrumbs for all flat
+    pages """
     if not hasattr(request,'breadcrumbs') or \
         not isinstance(request.breadcrumbs,Breadcrumbs):
         raise BreadcrumbNotSet(u"You need to setup breadcrumbs to use this " + \

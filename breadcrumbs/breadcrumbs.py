@@ -77,19 +77,21 @@ class Breadcrumbs(Singleton):
             return self
         return self.__init__(*args,**kwargs)
 
+    def __fill_home(self):
+        # fill home if settings.BREADCRUMBS_AUTO_HOME is True
+        if self.__autohome and len(self.__bds) == 0:
+            self.__fill_bds( ( _("Home"), u"/" ) )
+
     def _clean(self):
         self.__bds = []
         self.__autohome=getattr(settings,'BREADCRUMBS_AUTO_HOME',False)
         self.__urls =[]
+        self.__fill_home()
 
     def __init__(self,*args,**kwargs):
         """
         Call validate and if ok, call fill bd
         """
-        # fill home if settings.BREADCRUMBS_AUTO_HOME is True
-        if self.__autohome and len(self.__bds) == 0:
-            self.__fill_bds( ( _("Home"), u"/" ) )
-
         # match Breadcrumbs( 'name', 'url' )
         if len(args) == 2 and type(args[0]) not in (list,tuple):
             if(self.__validate(args,0)):
