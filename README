@@ -1,0 +1,61 @@
+django-breadcrumbs is a breadcrumb system to Django framework that allow  you to add custom breadcrumbs for each view and support FlatPages.
+
+django-breadcrumbs allow you to set breadcrumbs (one or more) in each view.
+django-breadcrumbs is a pluggable middleware app that set a 'breadcrumbs'
+iterable/callable object in request object that allow you add itens to
+breadcrumbs and iter on template.
+
+django-breadcrumbs accepts objects, lists or tuples added from
+request.breadcrumbs, objects need to have name and url attributes (a field,
+attribute or a property).
+
+
+1 - Flatpages+Breadcrumbs vs. only Breadcrumbs:
+
+Breadcrumbs have a simple patch to apply on django.contrib.flatpages.views,
+this path allow breadcrumbs to work with FlatPages recursively, using title
+set in admin. With 'recursively' I means that if you have /foobar/ and
+/foobar/crime/ breadcrumbs automatically create entries for both flatpages.
+
+To use Flatpages+Breadcrumbs simple copy content of django directory to your
+Django-1.1 directory and run `python setup.py install` again. You can put all
+content in your site-packages/django directory.
+
+If you want to use only breadcrumbs, copy only django/contrib/breadcrumbs to
+your django/contrib directory.
+
+2 - Setup Breadcrumbs
+ 
+ Breadcrumbs is easy to use, only what you need to setup is add
+ breadcrumbs.middleware.BreadcrumbsMiddleware to your MIDDLEWARE_CLASSES
+ setting on settings.py and enable it in your settings.py with options:
+
+{{{
+	BREADCRUMBS = False # Enable breadcrumbs
+	BREADCRUMBS_AUTO_HOME = False # If True, all times first link is (_("Home"),u"/")
+}}}
+
+3 - 'Registering' breadcrumbs is very, very easily. Breadcrumbs middleware
+provides a breadcrumbs() 'method' in request object. breadcrumbs() method
+accepts arguments in follow ways:
+{{{
+# one by one
+request.breadcrumbs( name, url )
+
+# various tuples/lists
+request.breadcrumbs( ( (name1, url1), (name2, url2), (name3, url3), ...,) )
+request.breadcrumbs( [ [name1, url1], [name2, url2], [name3, url3], ...] )
+
+# objects with attributes name and url in list / tuple format:
+request.breadcrumbs( ( obj1, obj2, obj3, obj4, ......) )
+request.breadcrumbs( [ obj1, obj2, obj3, obj4, ......] )
+}}}
+
+4 - To use breadcrumbs in template, only that you need is iterate over
+breadcrumbs, example:
+
+{{{
+{% for breadcrumb in request.breadcrumbs %}
+<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a>{% if not forloop.last %} >> {% endif %}
+{% endfor %}
+}}}
