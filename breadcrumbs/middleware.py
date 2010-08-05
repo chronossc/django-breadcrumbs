@@ -1,4 +1,4 @@
-from breadcrumbs import Breadcrumbs
+from .breadcrumbs import Breadcrumbs
 
 class BreadcrumbsMiddleware(object):
 
