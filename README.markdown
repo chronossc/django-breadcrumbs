@@ -7,6 +7,16 @@ In format of a pluggable middleware that add a breadcrumbs callable/iterable in 
 #1 - Install django-breadcrumbs
 
 Just put in your python patch and add **breadcrumbs.middleware.BreadcrumbsMiddleware** to your **MIDDLEWARE_CLASSES**.
+Also, if you did't put request context processor on yours TEMPLATE_CONTEXT_PROCESSORS, add it, ex:
+
+    TEMPLATE_CONTEXT_PROCESSORS = (
+        "django.contrib.auth.context_processors.auth",
+        "django.core.context_processors.debug",
+        "django.core.context_processors.i18n",
+        "django.core.context_processors.media",
+        "django.contrib.messages.context_processors.messages",
+        'django.core.context_processors.request',
+    )
 
 #2 - Adding breadcrumbs
 
