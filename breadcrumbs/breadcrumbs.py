@@ -80,7 +80,8 @@ class Breadcrumbs(Singleton):
     def __fill_home(self):
         # fill home if settings.BREADCRUMBS_AUTO_HOME is True
         if self.__autohome and len(self.__bds) == 0:
-            self.__fill_bds( ( _("Home"), u"/" ) )
+            home_title = getattr(settings, 'BREADCRUMBS_HOME_TITLE', _(u'Home'))
+            self.__fill_bds((home_title, u"/"))
 
     def _clean(self):
         self.__bds = []
