@@ -73,4 +73,5 @@ To use breadcrumbs in template, only that you need is iterate over breadcrumbs, 
 django-breadcrumbs have a single option to set in your settings.py:
 
 	BREADCRUMBS_AUTO_HOME: defaults to False, If True, breadcrumbs add as first Breadcrumb in list (_("Home"),u"/")
+	BREADCRUMBS_HOME_TITLE: defaults to _(u'Home')
 
