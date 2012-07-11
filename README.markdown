@@ -65,7 +65,7 @@ Is really easy to use, just add **breadcrumbs.middleware.FlatpageFallbackMiddlew
 To use breadcrumbs in template, only that you need is iterate over breadcrumbs, example:
 
 	{% for breadcrumb in request.breadcrumbs %}
-	<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a>{% if not forloop.last %} >> {% endif %}
+	<a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a>{% if not forloop.last %} &raquo; {% endif %}
 	{% endfor %}
 
 #5 - Options
