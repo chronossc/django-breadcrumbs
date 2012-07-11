@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name="django-breadcrumbs",
-    version="1.1.0",
+    version="1.1.1",
     description="Easy to use generic breadcrumbs system for Django framework.",
     author="Felipe 'chronos' Prenholato",
     author_email="philipe.rp@gmail.com",
