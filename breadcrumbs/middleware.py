@@ -7,6 +7,8 @@ from django.contrib.flatpages.views import flatpage
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 
+flatpage_middleware_class = 'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware'
+
 
 class BreadcrumbsMiddleware(object):
 
@@ -17,8 +19,10 @@ class BreadcrumbsMiddleware(object):
 
 class FlatpageFallbackMiddleware(object):
     def process_response(self, request, response):
-        # No need to check for a flatpage for non-404 responses.
-        if response.status_code != 404:
+        # do nothing if flatpages middleware isn't enabled, also if response
+        # code isn't 404.
+        if flatpage_middleware_class not in settings.MIDDLEWARE_CLASSES or \
+                                                    response.status_code != 404:
             return response
         try:
             # In old 1.0 we have a patch for flat pages, but as live app, we
