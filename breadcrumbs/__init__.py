@@ -1,2 +1,2 @@
 # -*- coding: utf-8 -*-
-from .breadcrumbs import Breadcrumb
+from breadcrumbs import Breadcrumb
