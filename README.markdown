@@ -6,17 +6,24 @@ In format of a pluggable middleware that add a breadcrumbs callable/iterable in 
 
 #1 - Install django-breadcrumbs
 
-Just put in your python path and add **breadcrumbs.middleware.BreadcrumbsMiddleware** to your **MIDDLEWARE_CLASSES**.
+Add **breadcrumbs.middleware.BreadcrumbsMiddleware** to your **MIDDLEWARE_CLASSES** and **breadcrumbs** to your **INSTALLED_APPS**.
+
+The middleware store breadcrumbs in request, and the app is needed to enable Django signals in breadcrumbs app.
+
 Also, if you did't put request context processor on yours TEMPLATE_CONTEXT_PROCESSORS, add it, ex:
 
     TEMPLATE_CONTEXT_PROCESSORS = (
-        "django.contrib.auth.context_processors.auth",
-        "django.core.context_processors.debug",
-        "django.core.context_processors.i18n",
-        "django.core.context_processors.media",
-        "django.contrib.messages.context_processors.messages",
-        'django.core.context_processors.request',
+        'django.contrib.auth.context_processors.auth',
+        'django.core.context_processors.debug',
+        'django.core.context_processors.i18n',
+        'django.core.context_processors.media',
+        'django.core.context_processors.static',
+        'django.core.context_processors.tz',
+        'django.contrib.messages.context_processors.messages',
+        'django.core.context_processors.request'
     )
+
+
 
 #2 - Adding breadcrumbs
 
@@ -58,7 +65,26 @@ All modes of add a breadcrumb:
 
 FlatPages is a app that allow user create urls with static content and a title. But create breadcrumbs for this kind of 'unknow' url path isn't fun at all, so I modified FlatpageFallbackMiddleware to fill breadcrumbs for each flat page in path.
 
-Is really easy to use, just add **breadcrumbs.middleware.FlatpageFallbackMiddleware** in your **MIDDLEWARE_CLASSES** after BreadcrumbsMiddleware and all done!
+Is really easy to use, just add **breadcrumbs.middleware.FlatpageFallbackMiddleware** in your **MIDDLEWARE_CLASSES** after BreadcrumbsMiddleware and remove Django FlatpageFallbackMiddleware. Now you flat pages will be in breadcrumbs too.
+
+FlatpageFallbackMiddleware will call **breadcrumbs.views.flatpage**, that as bonus, cache results of FlatPage models, avoiding DB in every request, and in every part of breadcrumb.
+
+## Flatpages in urls.py.
+
+Django also supports Flatpages in urls.py, as doc in http://goo.gl/iCvf3 show. To use this way, do something like:
+
+    urlpatterns = patterns('',
+        (r'^pages/', include('breadcrumbs.urls')),
+    )
+
+    urlpatterns += patterns('breadcrumbs.views',
+        (r'^pages2/(?P<url>.*)$', 'flatpage'),
+    )
+
+    urlpatterns += patterns('breadcrumbs.views',
+        url(r'^license/$', 'flatpage', {'url': '/flat04/'}, name='license'),
+    )
+
 
 #4 - Using in templates
 
