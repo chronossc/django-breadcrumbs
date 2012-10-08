@@ -1,6 +1,6 @@
 *django-breadcrumbs* is a breadcrumb system to Django framework that allow you to add custom breadcrumbs for simple views, generic views and support Django FlatPages app.
 
-In format of a pluggable middleware that add a breadcrumbs callable/iterable in your request object, allowing you to set  breadcrumbs (one or more) in each view accepting objects, lists or tuples added from request.breadcrumbs and is iterable, easy to use in templates providing a object with name and url attributes.
+It works as a pluggable middleware that add a breadcrumbs callable/iterable in your request object, allowing you to set  breadcrumbs (one or more) in each view accepting objects, lists or tuples added from request.breadcrumbs and is iterable, easy to use in templates providing a object with name and url attributes.
 
 *Note: For Django 1.x, check for tag 1.0 and patches :)*
 
