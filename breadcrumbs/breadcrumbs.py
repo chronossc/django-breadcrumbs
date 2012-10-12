@@ -8,19 +8,6 @@ from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
 
 
-class Singleton(object):
-
-    __instance__ = None
-
-    def __new__(cls, *a, **kw):
-        if Singleton.__instance__ is None:
-            Singleton.__instance__ = object.__new__(cls, *a, **kw)
-            cls._Singleton__instance = Singleton.__instance__
-        return Singleton.__instance__
-
-    def _drop_it(self):
-        Singleton.__instance__ = None
-
 # class Singleton(object):
 #     """
 #     We use a simple singleton pattern in Breadcrumbs.
@@ -76,22 +63,34 @@ class Breadcrumb(object):
         return u"Breadcrumb <%s,%s>" % (self.name, self.url)
 
 
+class Singleton(object):
+
+    __instance__ = None
+
+    def __new__(cls, *a, **kw):
+        if Singleton.__instance__ is None:
+            Singleton.__instance__ = object.__new__(cls, *a, **kw)
+            cls._Singleton__instance = Singleton.__instance__
+        return Singleton.__instance__
+
+    def _drop_it(self):
+        Singleton.__instance__ = None
+
+
 class Breadcrumbs(Singleton):
     """
     Breadcrumbs maintain a list of breadcrumbs that you can get interating with
     class or with get_breadcrumbs().
     """
-    def _1st_init(self, *args, **kwargs):
-        """
-        singleton function that start some variables
-        """
-        self._clean()
-        self.__init__(*args, **kwargs)
+    __bds = []
+    __autohome = getattr(settings, 'BREADCRUMBS_AUTO_HOME', False)
+    __urls = []
+    __started = False
 
     def __call__(self, *args, **kwargs):
         if not len(args) and not len(kwargs):
             return self
-        return self.__init__(*args, **kwargs)
+        return self._add(*args, **kwargs)
 
     def __fill_home(self):
         # fill home if settings.BREADCRUMBS_AUTO_HOME is True
@@ -105,25 +104,48 @@ class Breadcrumbs(Singleton):
         self.__urls = []
         self.__fill_home()
 
-    def __init__(self, *args, **kwargs):
-        """
-        Call validate and if ok, call fill bd
-        """
+    def _add(self, *a, **kw):
+
+        # match **{'name': name, 'url': url}
+        if kw.get('name') and kw.get('url'):
+            self.__validate((kw['name'], kw['url']), 0)
+            self.__fill_bds((kw['name'], kw['url']))
         # match Breadcrumbs( 'name', 'url' )
-        if len(args) == 2 and type(args[0]) not in (list, tuple):
-            if(self.__validate(args, 0)):
-                self.__fill_bds(args)
+        if len(a) == 2 and type(a[0]) not in (list, tuple):
+            if(self.__validate(a, 0)):
+                self.__fill_bds(a)
         # match ( ( 'name', 'url'), ..) and samething with list
-        elif len(args) == 1 and type(args[0]) in (list, tuple) \
-                and len(args[0]) > 0:
-            for i, arg in enumerate(args[0]):
-                if self.__validate(arg, i):
+        elif len(a) == 1 and type(a[0]) in (list, tuple) \
+                and len(a[0]) > 0:
+            for i, arg in enumerate(a[0]):
+                if isinstance(arg, dict):
+                    self._add(**arg)
+                elif self.__validate(arg, i):
                     self.__fill_bds(arg)
         # try to ( obj1, obj2, ... ) and samething with list
         else:
-            for i, arg in enumerate(args):
-                if(self.__validate(arg, i)):
-                    self.__fill_bds(arg)
+            for arg in a:
+                if type(arg) in (list, tuple):
+                    self._add(arg)
+                elif isinstance(arg, dict):
+                    self._add(**arg)
+                else:
+                    raise BreadcrumbsInvalidFormat(_("We accept lists of "
+                        "tuples, lists of dicts, or two args as name and url, "
+                        "not '%s'") % a)
+
+
+    def __init__(self, *a, **kw):
+        """
+        Call validate and if ok, call fill bd
+        """
+        super(Breadcrumbs, self).__init__(*a, **kw)
+        if not self.__started:
+            self._clean()
+            self.__started = True
+        if a or kw:
+            self._add(*a, **kw)
+
 
     def __validate(self, obj, index):
         """
@@ -145,11 +167,14 @@ class Breadcrumbs(Singleton):
                     You need to send as example (name,url)" % \
                     (index, type(obj).__name__)
                 )
-        # for objects
-        elif not hasattr(obj, 'name') and not hasattr(obj, 'url'):
-            raise BreadcrumbsInvalidFormat(u"You need to use a tuple like "
-                "(name,url) or object with name and url attributes for "
-                "breadcrumb.")
+        # for objects and dicts
+        else:
+            if isinstance(obj, dict) and obj.get('name') and obj.get('url'):
+                obj = Breadcrumb(obj['name'], obj['url'])
+            if not hasattr(obj, 'name') and not hasattr(obj, 'url'):
+                raise BreadcrumbsInvalidFormat(u"You need to use a tuple like "
+                    "(name, url) or dict or one object with name and url "
+                    "attributes for breadcrumb.")
         return True
 
     def __fill_bds(self, bd):
