@@ -20,3 +20,7 @@ notifications:
       - philipe.rp@gmail.com
     on_success: change
     on_failure: change
+branches:
+  only:
+    - master
+    - tests
