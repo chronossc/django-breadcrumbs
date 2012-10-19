@@ -1,5 +1,5 @@
 # # coding: utf-8
-
+import os
 from django.conf import settings
 from django.test import TestCase
 from django.utils.datastructures import SortedDict
@@ -8,12 +8,26 @@ from breadcrumbs.breadcrumbs import Breadcrumb, Breadcrumbs
 
 
 class BreadcrumbsTest(TestCase):
+    urls = 'breadcrumbs.tests.urls'
 
     def setUp(self):
         self.old_MIDDLEWARE_CLASSES = settings.MIDDLEWARE_CLASSES
         breadcrumbs_middleware_class = 'breadcrumbs.middleware.BreadcrumbsMiddleware'
         if breadcrumbs_middleware_class not in settings.MIDDLEWARE_CLASSES:
             settings.MIDDLEWARE_CLASSES += (breadcrumbs_middleware_class,)
+
+        self.old_TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS
+        request_processor = 'django.core.context_processors.request'
+        if request_processor not in settings.TEMPLATE_CONTEXT_PROCESSORS:
+            settings.TEMPLATE_CONTEXT_PROCESSORS += (request_processor,)
+
+        self.old_TEMPLATE_DIRS = settings.TEMPLATE_DIRS
+        settings.TEMPLATE_DIRS = (
+            os.path.join(
+                os.path.dirname(__file__),
+                'templates'
+            ),
+        )
 
         # now we start singleton. singleton are tested on singleton_tests.py
         self.breadcrumbs = Breadcrumbs()
@@ -30,6 +44,8 @@ class BreadcrumbsTest(TestCase):
 
     def tearDown(self):
         settings.MIDDLEWARE_CLASSES = self.old_MIDDLEWARE_CLASSES
+        settings.TEMPLATE_DIRS = self.old_TEMPLATE_DIRS
+        settings.TEMPLATE_CONTEXT_PROCESSORS = self.old_TEMPLATE_CONTEXT_PROCESSORS
 
         # kill singleton
         self.breadcrumbs._drop_it()
@@ -62,3 +78,10 @@ class BreadcrumbsTest(TestCase):
         b(self.data[3:5])
         for i, bd in enumerate(b):
             self.assertEqual(bd.__dict__, Breadcrumb(**self.data[i]).__dict__)
+
+
+    def test_request_breadcrumbs(self):
+        response = self.client.get('/page1/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response,
+            '<ul id="breadcrumbs"><li><a href="/page1/">Page 1</a></li></ul>')

@@ -1,0 +1,62 @@
+[
+    {
+        "pk": 1,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "registration_required": false,
+            "title": "Flat Page 1",
+            "url": "/flat01/",
+            "template_name": "",
+            "sites": [
+                1
+            ],
+            "content": "This is flat 1",
+            "enable_comments": false
+        }
+    },
+    {
+        "pk": 2,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "registration_required": false,
+            "title": "Flat page 2",
+            "url": "/flat01/flat02/",
+            "template_name": "",
+            "sites": [
+                1
+            ],
+            "content": "This is flat 2 under flat 1",
+            "enable_comments": false
+        }
+    },
+    {
+        "pk": 3,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "registration_required": false,
+            "title": "Flat page 3",
+            "url": "/flat01/flat02/flat03/",
+            "template_name": "",
+            "sites": [
+                1
+            ],
+            "content": "This is flat 3 under flat 2 that is under flat 1",
+            "enable_comments": false
+        }
+    },
+    {
+        "pk": 4,
+        "model": "flatpages.flatpage",
+        "fields": {
+            "registration_required": false,
+            "title": "Flat Page 4",
+            "url": "/flat04/",
+            "template_name": "",
+            "sites": [
+                1
+            ],
+            "content": "This is flat 4 :)",
+            "enable_comments": false
+        }
+    }
+]

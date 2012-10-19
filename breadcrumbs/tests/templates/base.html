@@ -1,0 +1,17 @@
+{% spaceless %}<!DOCTYPE html>
+<html>
+<head>
+<title>{{ flatpage.title }}</title>
+</head>
+<body>
+{% block breadcrumb %}
+<ul id="breadcrumbs">
+{% for breadcrumb in request.breadcrumbs %}
+<li><a href="{{ breadcrumb.url }}">{{ breadcrumb.name }}</a>{% if not forloop.last %} &raquo; {% endif %}</li>
+{% endfor %}
+</ul>
+{% endblock breadcrumb %}
+{% block body %}
+{% endblock body %}
+</body>
+</html>{% endspaceless %}

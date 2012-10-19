@@ -7,6 +7,8 @@ from django.conf import settings
 
 if not settings.configured:
     settings_dict = dict(
+        SITE_ID=1,
+        ROOT_URLCONF='breadcrumbs.tests.urls',
         INSTALLED_APPS=(
             'django.contrib.contenttypes',
             'django.contrib.sites',
