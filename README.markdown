@@ -1,6 +1,6 @@
 # Django Breadcrumbs
 
-<a href="https://travis-ci.org/#!/chronossc/django-breadcrumbs" title="Django Breadcrumbs Travis Status"><img src="https://secure.travis-ci.org/getsentry/sentry.png?branch=master"></a>
+<a href="https://travis-ci.org/#!/chronossc/django-breadcrumbs" title="Django Breadcrumbs Travis Status"><img src="https://secure.travis-ci.org/chronossc/django-breadcrumbs.png?branch=master"></a>
 
 *django-breadcrumbs* is a breadcrumb system to Django framework that allow you to add custom breadcrumbs for simple views, generic views and support Django FlatPages app.
 
