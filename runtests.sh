@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "This is a helper script to test breadcrumbs against many environ versions."
-echo "This script test against Django 1.2x, 1.3.x and 1.4.x using sqlite. It depends of pip."
+echo "This script test against Django 1.3.x and 1.4.x using sqlite. It depends of pip."
 
 OLD_DJANGO="$(pip freeze | grep Django)"
 

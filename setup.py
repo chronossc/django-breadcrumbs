@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
     name="django-breadcrumbs",
-    version="1.1.2-p1",
+    version="1.1.3",
     packages=find_packages(exclude=('breadcrumbs_sample*', 'sample_d14*')),
     author="Felipe 'chronos' Prenholato",
     author_email="philipe.rp@gmail.com",
@@ -27,5 +27,5 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
     ],
-    install_requires=["Django>=1.2.7"],
+    install_requires=["Django>=1.3.4"],
 )
