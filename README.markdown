@@ -6,10 +6,12 @@
 
 It works as a pluggable middleware that add a breadcrumbs callable/iterable in your request object, allowing you to set  breadcrumbs (one or more) in each view accepting objects, lists or tuples added from request.breadcrumbs and is iterable, easy to use in templates providing a object with name and url attributes.
 
-# Django versions
+# Django versions support.
 
 Breadcrumbs support 1.3.x and 1.4.x releases of Django.
 Django 1.2.x support was dropped in django-breadcrumbs-1.1.3.
+
+My support will follow Django policy.
 
 #1 - Install django-breadcrumbs
 
