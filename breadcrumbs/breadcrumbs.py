@@ -172,6 +172,9 @@ class Breadcrumbs(Singleton):
             self.__bds.append(bd)
             self.__urls.append(bd.url)
 
+    def __len__(self):
+        return len(self.__bds)
+
     def __iter__(self):
         return iter(self.__bds)
 
