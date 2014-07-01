@@ -50,30 +50,11 @@ class Breadcrumb(object):
     def __repr__(self):
         return u"Breadcrumb <%s,%s>" % (self.name, self.url)
 
-
-class Singleton(object):
-
-    __instance__ = None
-
-    def __new__(cls, *a, **kw):
-        if Singleton.__instance__ is None:
-            Singleton.__instance__ = object.__new__(cls, *a, **kw)
-            cls._Singleton__instance = Singleton.__instance__
-        return Singleton.__instance__
-
-    def _drop_it(self):
-        Singleton.__instance__ = None
-
-
-class Breadcrumbs(Singleton):
+class Breadcrumbs(object):
     """
     Breadcrumbs maintain a list of breadcrumbs that you can get interating with
     class or with get_breadcrumbs().
     """
-    __bds = []
-    __autohome = getattr(settings, 'BREADCRUMBS_AUTO_HOME', False)
-    __urls = []
-    __started = False
 
     def __call__(self, *args, **kwargs):
         if not len(args) and not len(kwargs):
@@ -128,9 +109,7 @@ class Breadcrumbs(Singleton):
         Call validate and if ok, call fill bd
         """
         super(Breadcrumbs, self).__init__(*a, **kw)
-        if not self.__started:
-            self._clean()
-            self.__started = True
+        self._clean()
         if a or kw:
             self._add(*a, **kw)
 
