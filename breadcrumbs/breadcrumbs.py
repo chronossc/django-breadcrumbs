@@ -6,6 +6,7 @@ TODO: maybe is better to move to contrib/breadcrumbs
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
+from django.utils import six
 
 
 class BreadcrumbsInvalidFormat(Exception):
@@ -140,8 +141,8 @@ class Breadcrumbs(Singleton):
         if type(obj) in (list, tuple):
             if len(obj) == 2:
                 if (not obj[0] and not obj[1]) or \
-                        (type(obj[0]) not in (str, unicode) and \
-                        type(obj[1]) not in (str, unicode)):
+                        not isinstance(obj[0], six.string_types) and \
+                        not isinstance(obj[1], six.string_types):
                     raise BreadcrumbsInvalidFormat(u"Invalid format for \
                         breadcrumb %s in %s" % (index, type(obj).__name__))
             if len(obj) != 2:
