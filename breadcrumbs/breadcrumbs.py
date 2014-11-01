@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 """
 Classes to add request.breadcrumbs as one class to have a list of breadcrumbs
 TODO: maybe is better to move to contrib/breadcrumbs
