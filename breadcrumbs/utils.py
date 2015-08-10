@@ -95,7 +95,7 @@ def breadcrumbs_for_flatpages(request, flatpage):
             request.breadcrumbs(flatpage.title, flatpage.url)
         else:
             try:
-                f = FlatPage.objects.get(url=url)
+                f = FlatPage.objects.get(url=url, sites=settings.SITE_ID)
             except FlatPage.DoesNotExist:
                 # TODO: this part can be a view, maybe is a good idea get that
                 # view and check for viewfunc.breadcrumb_title or
