@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.flatpages.models import FlatPage
 from django.http import Http404
-from breadcrumbs import Breadcrumbs, BreadcrumbsNotSet
+from .breadcrumbs import Breadcrumbs, BreadcrumbsNotSet
 from django.conf import settings
 from django.core.cache import cache
 

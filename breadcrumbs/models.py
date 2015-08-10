@@ -2,7 +2,7 @@
 from django.contrib.flatpages.models import FlatPage
 from django.core.cache import cache
 from django.db.models.signals import post_save
-from utils import make_flatpages_cache_key
+from .utils import make_flatpages_cache_key
 
 
 def clean_flatpages_cache(sender, **kw):

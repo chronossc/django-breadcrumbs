@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.flatpages.views import render_flatpage
 from django.http import Http404, HttpResponsePermanentRedirect
-from utils import breadcrumbs_for_flatpages, get_flapage_from_cache
+from .utils import breadcrumbs_for_flatpages, get_flapage_from_cache
 
 
 def flatpage(request, url):

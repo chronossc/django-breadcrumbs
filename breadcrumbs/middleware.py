@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.http import Http404
-from breadcrumbs import Breadcrumbs
-from views import flatpage
+from .breadcrumbs import Breadcrumbs
+from .views import flatpage
 
 
 class BreadcrumbsMiddleware(object):
