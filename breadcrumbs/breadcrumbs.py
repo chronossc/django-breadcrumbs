@@ -1,13 +1,16 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 Classes to add request.breadcrumbs as one class to have a list of breadcrumbs
 TODO: maybe is better to move to contrib/breadcrumbs
 """
 
 from django.conf import settings
-from django.utils.translation import ugettext as _
 from django.utils.safestring import mark_safe
-from django.utils import six
+from django.utils.translation import ugettext as _
+try:
+    from django.utils import six
+except ImportError:
+    import six
 
 
 class BreadcrumbsInvalidFormat(Exception):
