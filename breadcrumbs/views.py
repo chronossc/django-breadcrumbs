@@ -33,3 +33,4 @@ def flatpage(request, url):
     breadcrumbs_for_flatpages(request, f)
 
     return render_flatpage(request, f)
+

@@ -10,7 +10,8 @@
     <body>
         {{ request.breadcrumbs }}
         <p>Breadcrumb: {% for b in request.breadcrumbs %}<a href="{{ b.url }}">{{ b.name }}</a>{% if not forloop.last %} / {% endif %}{% endfor %}</p>
-        <p>Links: <a href='/'>Home</a> | <a href='/someview/'>Breadcrumb in view</a> | <a href='/flat01/'>Flatpages</a>
+        {# use urls tag in your project right :) #}
+        <p>Links: <a href='/'>Home</a> | <a href='/someview/'>Breadcrumb in view</a> | <a href='/flat01/'>Flatpages</a> |<br> <a href="/cbvhome" title="Class Based view home">Class Based view home</a> | <a href="/cbvhome/L1/" title="Class Based View Level 1">Class Based View Level 1</a> | <a href="/cbvhome/L1/L2/3" title="Class Based View Level 2 with args">Class Based View Level 2 with args</a>
         <p>Content: <br>
         {% if text %}{{ text }}{% endif %}
         {% if flatpage %}{{ flatpage.content }}{% endif %}

@@ -13,19 +13,7 @@ except ImportError:
     import six
 
 
-class BreadcrumbsInvalidFormat(Exception):
-    """
-    Simple exception that can be extended
-    """
-    pass
-
-
-class BreadcrumbsNotSet(Exception):
-    """
-    Raised in utils.breadcrumbs_for_flatpages when we not have breadcrumbs in
-    request.
-    """
-    pass
+from .exceptions import BreadcrumbsInvalidFormat
 
 
 class Breadcrumb(object):
@@ -51,21 +39,7 @@ class Breadcrumb(object):
         return u"Breadcrumb <%s,%s>" % (self.name, self.url)
 
 
-class Singleton(object):
-
-    __instance__ = None
-
-    def __new__(cls, *a, **kw):
-        if Singleton.__instance__ is None:
-            Singleton.__instance__ = object.__new__(cls, *a, **kw)
-            cls._Singleton__instance = Singleton.__instance__
-        return Singleton.__instance__
-
-    def _drop_it(self):
-        Singleton.__instance__ = None
-
-
-class Breadcrumbs(Singleton):
+class Breadcrumbs(object):
     """
     Breadcrumbs maintain a list of breadcrumbs that you can get interating with
     class or with get_breadcrumbs().
@@ -118,10 +92,10 @@ class Breadcrumbs(Singleton):
                 elif isinstance(arg, dict):
                     self._add(**arg)
                 else:
-                    raise BreadcrumbsInvalidFormat(_("We accept lists of "
-                        "tuples, lists of dicts, or two args as name and url, "
-                        "not '%s'") % a)
-
+                    raise BreadcrumbsInvalidFormat(
+                        "We accept lists of tuples, lists of dicts, or two "
+                        "args as name and url, but not '%s'" % a
+                    )
 
     def __init__(self, *a, **kw):
         """
@@ -129,11 +103,9 @@ class Breadcrumbs(Singleton):
         """
         super(Breadcrumbs, self).__init__(*a, **kw)
         if not self.__started:
-            self._clean()
             self.__started = True
         if a or kw:
             self._add(*a, **kw)
-
 
     def __validate(self, obj, index):
         """
@@ -151,18 +123,19 @@ class Breadcrumbs(Singleton):
                         breadcrumb %s in %s" % (index, type(obj).__name__))
             if len(obj) != 2:
                 raise BreadcrumbsInvalidFormat(
-                    u"Wrong itens number in breadcrumb %s in %s. \
-                    You need to send as example (name,url)" % \
-                    (index, type(obj).__name__)
+                    "Wrong itens number in breadcrumb %s in %s. You need to "
+                    "send as example (name,url)" % (index, type(obj).__name__)
                 )
+
         # for objects and dicts
         else:
             if isinstance(obj, dict) and obj.get('name') and obj.get('url'):
                 obj = Breadcrumb(obj['name'], obj['url'])
             if not hasattr(obj, 'name') and not hasattr(obj, 'url'):
-                raise BreadcrumbsInvalidFormat(u"You need to use a tuple like "
-                    "(name, url) or dict or one object with name and url "
-                    "attributes for breadcrumb.")
+                raise BreadcrumbsInvalidFormat(
+                    "You need to use a tuple like (name, url) or dict or one "
+                    "object with name and url attributes for breadcrumb."
+                )
         return True
 
     def __fill_bds(self, bd):
@@ -193,8 +166,9 @@ class Breadcrumbs(Singleton):
         return self.__unicode__()
 
     def __unicode__(self):
-        return u"Breadcrumbs <%s>" % u", ".join([mark_safe(item.name) for item \
-                                                    in self[:10]] + [u' ...'])
+        return u"Breadcrumbs <%s>" % u", ".join(
+            [mark_safe(item.name) for item in self[:10]] + [u' ...']
+        )
 
     def all(self):
         return self.__bds

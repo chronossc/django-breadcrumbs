@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.http import Http404
+
 from .breadcrumbs import Breadcrumbs
 from .views import flatpage
 
@@ -9,7 +10,6 @@ class BreadcrumbsMiddleware(object):
 
     def process_request(self, request):
         request.breadcrumbs = Breadcrumbs()
-        request.breadcrumbs._clean()
 
 
 class FlatpageFallbackMiddleware(object):

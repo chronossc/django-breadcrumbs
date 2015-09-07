@@ -1,2 +1,0 @@
-Django>=1.4.1
-pylibmc>=1.2.3

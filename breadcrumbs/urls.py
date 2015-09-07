@@ -1,5 +1,6 @@
-from django.conf.urls import patterns
+from django.conf.urls import patterns, url
 
-urlpatterns = patterns('breadcrumbs.views',
-    (r'^(?P<url>.*)$', 'flatpage'),
+urlpatterns = patterns(
+    'breadcrumbs.views',
+    url(r'^(?P<url>.*)$', 'flatpage'),
 )
