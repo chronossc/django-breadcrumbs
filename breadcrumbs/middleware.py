@@ -3,14 +3,20 @@ from django.conf import settings
 from django.http import Http404
 from .breadcrumbs import Breadcrumbs
 
+try:
+    from django.utils.deprecation import MiddlewareMixin
+except ImportError:  # Django < 1.10
+    # Works perfectly for everyone using MIDDLEWARE_CLASSES
+    MiddlewareMixin = object
 
-class BreadcrumbsMiddleware(object):
+
+class BreadcrumbsMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if not hasattr(request, 'breadcrumbs'):
             request.breadcrumbs = Breadcrumbs()
 
 
-class FlatpageFallbackMiddleware(object):
+class FlatpageFallbackMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         # do nothing if flatpages middleware isn't enabled, also if response
         # code isn't 404.
