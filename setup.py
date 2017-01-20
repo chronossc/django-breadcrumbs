@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
     name="django-breadcrumbs",
-    version="1.1.3-p1",
+    version="1.1.4",
     packages=find_packages(exclude=('breadcrumbs_sample*', 'sample_d14*')),
     author="Felipe 'chronos' Prenholato",
     author_email="philipe.rp@gmail.com",
