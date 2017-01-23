@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
-__version__ = '1.1.3-p1'
+__version__ = '1.1.4'
 
 from .breadcrumbs import Breadcrumb
